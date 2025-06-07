@@ -1,7 +1,18 @@
-const mongoose=require("mongoose")
-require('dotenv').config()
-database=process.env.DATABASE_URL
-const url=database
-module.exports.connect=()=>{
-    mongoose.connect(url,console.log("Databse is connected"))
+// backend/db.js
+const mongoose = require("mongoose");
+require("dotenv").config();
+
+const database = process.env.DATABASE_URL;
+
+if (!database) {
+  throw new Error("❌ DATABASE_URL is missing in .env file");
 }
+
+module.exports.connect = async () => {
+  try {
+    await mongoose.connect(database);
+    console.log("✅ Database is connected");
+  } catch (err) {
+    console.error("❌ Database connection failed:", err.message);
+  }
+};

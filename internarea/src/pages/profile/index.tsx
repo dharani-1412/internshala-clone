@@ -1,21 +1,67 @@
+"use client";
 import { selectuser } from "@/Feature/Userslice";
-import { ExternalLink, Mail, User } from "lucide-react";
+import { ExternalLink, Mail, User, MapPin, CloudSun } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
+
 interface User {
   name: string;
   email: string;
   photo: string;
 }
-const index = () => {
-  // const [user, setuser] = useState<User | null>({
-  //   name: "Rahul",
-  //   email: "xyz@gmail.com",
-  //   photo:
-  //     "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=faces",
-  // });
-  const user=useSelector(selectuser)
+
+const Index = () => {
+  const user = useSelector(selectuser);
+
+  const [location, setLocation] = useState<string>("");
+  const [weather, setWeather] = useState<string>("");
+
+  const getLocationAndWeather = async () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const { latitude, longitude } = position.coords;
+
+      // 1. Get Location Info using Google Maps Geocoding API
+      const geoResponse = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyCQa_dCpPkEGcs-yLjWx4ZPGqKvheXCvRg `
+      );
+      const geoData = await geoResponse.json();
+      const addressComponents = geoData.results[0]?.address_components || [];
+
+      let city = "", state = "", country = "";
+
+      addressComponents.forEach((component: any) => {
+        if (component.types.includes("locality")) {
+          city = component.long_name;
+        }
+        if (component.types.includes("administrative_area_level_1")) {
+          state = component.long_name;
+        }
+        if (component.types.includes("country")) {
+          country = component.long_name;
+        }
+      });
+
+      setLocation(`Location: ${city}, ${state}, ${country}`);
+
+      // 2. Get Weather using OpenWeatherMap API
+      const weatherResponse = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=a0e7008f6aa5ef58930fbb41fb441ed5&units=metric`
+      );
+      const weatherData = await weatherResponse.json();
+
+      const temp = weatherData.main.temp;
+      const condition = weatherData.weather[0].description;
+
+      setWeather(`Weather: ${temp}°C, ${condition.charAt(0).toUpperCase() + condition.slice(1)}`);
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -47,29 +93,42 @@ const index = () => {
               </div>
             </div>
 
-            {/* Profile Details */}
+            {/* Location and Weather */}
+            <div className="space-y-2 text-center mb-6">
+              {location && (
+                <div className="text-gray-700 flex items-center justify-center gap-2">
+                  <MapPin className="w-4 h-4 text-blue-500" />
+                  {location}
+                </div>
+              )}
+              {weather && (
+                <div className="text-gray-700 flex items-center justify-center gap-2">
+                  <CloudSun className="w-4 h-4 text-yellow-500" />
+                  {weather}
+                </div>
+              )}
+              <button
+                onClick={getLocationAndWeather}
+                className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Obtain Location
+              </button>
+            </div>
+
+            {/* Quick Stats */}
             <div className="space-y-6">
-              {/* Quick Stats */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-blue-50 rounded-lg p-4 text-center">
-                  <span className="text-blue-600 font-semibold text-2xl">
-                    0
-                  </span>
-                  <p className="text-blue-600 text-sm mt-1">
-                    Active Applications
-                  </p>
+                  <span className="text-blue-600 font-semibold text-2xl">0</span>
+                  <p className="text-blue-600 text-sm mt-1">Active Applications</p>
                 </div>
                 <div className="bg-green-50 rounded-lg p-4 text-center">
-                  <span className="text-green-600 font-semibold text-2xl">
-                    0
-                  </span>
-                  <p className="text-green-600 text-sm mt-1">
-                    Accepted Applications
-                  </p>
+                  <span className="text-green-600 font-semibold text-2xl">0</span>
+                  <p className="text-green-600 text-sm mt-1">Accepted Applications</p>
                 </div>
               </div>
 
-              {/* Actions */}
+              {/* View Applications */}
               <div className="flex justify-center pt-4">
                 <Link
                   href="/userapplication"
@@ -87,4 +146,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;
