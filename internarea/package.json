@@ -4,10 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "export": "next export"
+  "build": "next build && next export",
+  "start": "next start"
+    
   },
   "dependencies": {
     "@netlify/plugin-nextjs": "^5.11.2",
