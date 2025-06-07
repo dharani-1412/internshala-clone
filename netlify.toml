@@ -1,7 +1,8 @@
 [build]
-  base = "internarea"
   command = "npm run build"
-  publish = "internarea/.next"
+  publish = "out"
 
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
