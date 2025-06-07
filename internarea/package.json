@@ -8,9 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "export": "next export"
-
   },
   "dependencies": {
+    "@netlify/plugin-nextjs": "^5.11.2",
     "@reduxjs/toolkit": "^2.6.1",
     "axios": "^1.8.1",
     "cors": "^2.8.5",

@@ -1,0 +1,7 @@
+[build]
+  base = "internarea"
+  command = "npm run build"
+  publish = "internarea/.next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
